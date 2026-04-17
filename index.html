@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JNTU Sync - ATDNCE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0b0e14; }
+        .glass { background: rgba(22, 27, 34, 0.8); backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="text-slate-200 font-sans antialiased">
+
+    <div class="min-h-screen p-4 md:p-10">
+        <div class="max-w-5xl mx-auto">
+            
+            <header class="flex justify-between items-center mb-10 glass p-6 rounded-3xl border border-slate-800 shadow-2xl">
+                <div>
+                    <h1 class="text-2xl font-black text-cyan-400">JNTU <span class="text-white underline decoration-cyan-500/30">SYNC</span></h1>
+                    <p class="text-[10px] text-slate-500 font-bold tracking-[0.2em] uppercase mt-1">Attendance Portal</p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-xs font-bold text-white">Armaan Singh</p>
+                        <p class="text-[10px] text-slate-500">CSE - SEC A</p>
+                    </div>
+                    <div class="w-12 h-12 bg-gradient-to-tr from-cyan-500 to-blue-600 rounded-2xl rotate-3 shadow-lg shadow-cyan-500/20 border border-white/10"></div>
+                </div>
+            </header>
+
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+                <div class="glass p-6 rounded-[2rem] border border-slate-800/50 relative overflow-hidden group">
+                    <div class="absolute -right-2 -top-2 w-12 h-12 bg-cyan-500/10 rounded-full blur-xl group-hover:bg-cyan-500/20 transition-all"></div>
+                    <p class="text-slate-500 text-xs font-bold uppercase tracking-widest mb-3">Overall</p>
+                    <h2 class="text-4xl font-black text-white italic">82<span class="text-cyan-500 text-xl not-italic">%</span></h2>
+                </div>
+
+                <div class="glass p-6 rounded-[2rem] border border-slate-800/50">
+                    <p class="text-slate-500 text-xs font-bold uppercase tracking-widest mb-3 text-green-500/50">Present</p>
+                    <h2 class="text-4xl font-black text-green-400 italic">124</h2>
+                </div>
+
+                <div class="glass p-6 rounded-[2rem] border border-slate-800/50">
+                    <p class="text-slate-500 text-xs font-bold uppercase tracking-widest mb-3 text-red-500/50">Absent</p>
+                    <h2 class="text-4xl font-black text-red-400 italic">12</h2>
+                </div>
+
+                <div class="glass p-6 rounded-[2rem] border border-slate-800/50">
+                    <p class="text-slate-500 text-xs font-bold uppercase tracking-widest mb-3 text-yellow-500/50">Late</p>
+                    <h2 class="text-4xl font-black text-yellow-400 italic">02</h2>
+                </div>
+            </div>
+
+            <main class="glass p-10 md:p-16 rounded-[3rem] border border-slate-800 text-center relative shadow-inner">
+                <div class="inline-block px-4 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-bold uppercase tracking-tighter mb-6">
+                    Live Session Active
+                </div>
+                <h3 class="text-3xl md:text-5xl font-black text-white mb-4 tracking-tighter">Ready to sync?</h3>
+                <p class="text-slate-500 max-w-sm mx-auto mb-10 text-sm leading-relaxed">
+                    Make sure you are within the JNTU campus geofence to successfully mark your attendance.
+                </p>
+                
+                <button onclick="this.innerHTML='SYNCING...'; setTimeout(()=> {this.innerHTML='SUCCESS'; this.className='bg-green-500 text-black font-black px-14 py-5 rounded-2xl shadow-xl shadow-green-500/20 tracking-widest scale-95 transition-all';}, 1500)" 
+                        class="bg-cyan-500 hover:bg-cyan-400 text-black font-black px-14 py-5 rounded-2xl transition-all transform hover:scale-105 active:scale-95 shadow-xl shadow-cyan-500/40 uppercase tracking-widest text-sm">
+                    Mark Present
+                </button>
+            </main>
+
+        </div>
+    </div>
+
+</body>
+</html>
