@@ -9,8 +9,6 @@
     <style>
         body { background-color: #0b0e14; scroll-behavior: smooth; }
         .glass-card { background: rgba(22, 27, 34, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); }
-        .reveal { opacity: 0; transform: translateY(30px); transition: 1s all ease; }
-        .reveal.active { opacity: 1; transform: translateY(0); }
     </style>
 </head>
 <body class="text-slate-200">
@@ -18,97 +16,158 @@
     <div class="max-w-6xl mx-auto p-6 md:p-12">
         <nav class="sticky top-6 z-50 glass-card px-8 py-4 rounded-3xl flex justify-between items-center mb-12 shadow-2xl">
             <h2 class="font-black text-xl tracking-tighter">JSYNC <span class="text-cyan-500">.</span></h2>
-            <div class="flex gap-6 items-center">
-                <a href="about.html" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-white">About</a>
-                <a href="contact.html" class="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-white">Contact</a>
-                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-500 border border-white/20"></div>
+            <div class="flex gap-4 items-center">
+                <div class="text-right hidden md:block">
+                    <p id="displayUser" class="text-xs font-bold text-white uppercase tracking-wider"></p>
+                    <p class="text-[10px] text-cyan-400">Mech (Reg) - Sem 2</p>
+                </div>
+                <button onclick="logout()" class="text-[10px] ml-4 font-bold text-red-400 uppercase tracking-widest hover:text-red-300 bg-red-500/10 px-3 py-1 rounded-full border border-red-500/20">Logout</button>
             </div>
         </nav>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            <div class="glass-card p-8 rounded-[2.5rem] reveal active">
-                <p class="text-xs font-black text-slate-500 uppercase tracking-[0.2em] mb-6">Attendance Trends</p>
-                <canvas id="attendanceChart" height="200"></canvas>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+            <div class="glass-card p-6 rounded-[2rem] border-t-2 border-t-cyan-500">
+                <p class="text-slate-500 text-[10px] font-black uppercase mb-1">Today is</p>
+                <h3 id="todayName" class="text-2xl font-black text-white">Monday</h3>
             </div>
-
-            <div class="grid grid-cols-2 gap-4 reveal active">
-                <div class="glass-card p-6 rounded-[2rem] flex flex-col justify-center">
-                    <p class="text-slate-500 text-[10px] font-black uppercase mb-2">Total Score</p>
-                    <h3 class="text-5xl font-black text-white italic">82%</h3>
-                </div>
-                <div class="glass-card p-6 rounded-[2rem] flex flex-col justify-center">
-                    <p class="text-slate-500 text-[10px] font-black uppercase mb-2">Streak</p>
-                    <h3 class="text-5xl font-black text-cyan-400 italic">14<span class="text-sm">days</span></h3>
-                </div>
-                <div class="glass-card p-6 rounded-[2rem] flex flex-col justify-center border-l-4 border-l-green-500/50">
-                    <p class="text-slate-500 text-[10px] font-black uppercase mb-2 text-green-500">Present</p>
-                    <h3 class="text-3xl font-black text-white">124</h3>
-                </div>
-                <div class="glass-card p-6 rounded-[2rem] flex flex-col justify-center border-l-4 border-l-red-500/50">
-                    <p class="text-slate-500 text-[10px] font-black uppercase mb-2 text-red-500">Absent</p>
-                    <h3 class="text-3xl font-black text-white">12</h3>
-                </div>
+            <div class="glass-card p-6 rounded-[2rem]">
+                <p class="text-slate-500 text-[10px] font-black uppercase mb-1">Total Classes</p>
+                <h3 id="totalClasses" class="text-2xl font-black text-white">0</h3>
+            </div>
+            <div class="glass-card p-6 rounded-[2rem]">
+                <p class="text-slate-500 text-[10px] font-black uppercase mb-1 text-green-500">Attended</p>
+                <h3 id="attendedClasses" class="text-2xl font-black text-white">0</h3>
+            </div>
+            <div class="glass-card p-6 rounded-[2rem]">
+                <p class="text-slate-500 text-[10px] font-black uppercase mb-1 text-cyan-400">Attendance %</p>
+                <h3 id="attendancePercent" class="text-2xl font-black text-white">0%</h3>
             </div>
         </div>
 
-        <div class="glass-card p-12 md:p-20 rounded-[3.5rem] text-center reveal">
-            <div class="inline-block px-4 py-1 rounded-full bg-cyan-500/10 text-cyan-400 text-[10px] font-black uppercase tracking-widest mb-6">Device Verified</div>
-            <h2 class="text-4xl md:text-6xl font-black text-white tracking-tighter mb-8 italic">Ready to Check-in?</h2>
-            <button onclick="markAttendance(this)" class="bg-white text-black font-black px-16 py-6 rounded-2xl hover:bg-cyan-400 transition-all duration-500 shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-cyan-500/40 transform hover:scale-105">
-                VERIFY & SYNC
-            </button>
+        <div class="mb-8">
+            <h2 class="text-2xl font-black text-white tracking-tighter mb-6">Today's Schedule</h2>
+            <div id="scheduleContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                </div>
         </div>
     </div>
 
     <script>
-        // Chart Logic
-        const ctx = document.getElementById('attendanceChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-                datasets: [{
-                    label: 'Attendance Rate',
-                    data: [75, 82, 80, 85, 82, 88],
-                    borderColor: '#06b6d4',
-                    backgroundColor: 'rgba(6, 182, 212, 0.1)',
-                    fill: true,
-                    tension: 0.4,
-                    borderWidth: 4,
-                    pointRadius: 0
-                }]
-            },
-            options: {
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: { grid: { display: false }, ticks: { color: '#475569' } },
-                    y: { display: false }
-                }
-            }
-        });
+        // 1. Session Check
+        const currentUser = localStorage.getItem('currentUser');
+        if(!currentUser) window.location.href = 'index.html';
+        document.getElementById('displayUser').innerText = currentUser;
 
-        // Scroll Reveal Logic
-        function reveal() {
-            var reveals = document.querySelectorAll(".reveal");
-            for (var i = 0; i < reveals.length; i++) {
-                var windowHeight = window.innerHeight;
-                var elementTop = reveals[i].getBoundingClientRect().top;
-                if (elementTop < windowHeight - 100) {
-                    reveals[i].classList.add("active");
+        // 2. THE MASTER DATABASE
+        const collegeDB = {
+            "Mech_Reg": {
+                "Sem_2": {
+                    "Monday": [
+                        { id: "egcad_t", name: "EGCAD (Theory)", duration: "1.5 hr" },
+                        { id: "egcad_p", name: "EGCAD (Practical)", duration: "1.5 hr" },
+                        { id: "beee", name: "BEEE", duration: "1 hr" },
+                        { id: "ime", name: "IME", duration: "1 hr" }
+                    ],
+                    "Tuesday": [
+                        { id: "beee", name: "BEEE", duration: "1 hr" },
+                        { id: "ac", name: "AC", duration: "1.5 hr" },
+                        { id: "msm", name: "MSM", duration: "1.5 hr" }
+                    ],
+                    "Wednesday": [
+                        { id: "beee_long", name: "BEEE", duration: "2 hr" },
+                        { id: "ime", name: "IME", duration: "1 hr" },
+                        { id: "msm", name: "MSM", duration: "1.5 hr" }
+                    ],
+                    "Thursday": [
+                        { id: "ac", name: "AC", duration: "1.5 hr" },
+                        { id: "odvec", name: "ODVEC", duration: "1.5 hr" },
+                        { id: "msm", name: "MSM", duration: "1.5 hr" },
+                        { id: "egcad_t_short", name: "EGCAD (Theory)", duration: "1 hr" }
+                    ],
+                    "Friday": [
+                        { id: "odvec", name: "ODVEC", duration: "1.5 hr" },
+                        { id: "ppl_cle", name: "PPL / CLE", duration: "2 hr" }
+                    ],
+                    "Saturday": [],
+                    "Sunday": []
                 }
             }
+        };
+
+        // 3. Get Today's Day
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        // For testing, let's force it to be Monday. To make it real-time, change 'Monday' to days[new Date().getDay()]
+        const today = 'Monday'; // Change this manually to test different days!
+        document.getElementById('todayName').innerText = today;
+
+        // 4. Load the Schedule
+        const mySchedule = collegeDB["Mech_Reg"]["Sem_2"][today];
+        const container = document.getElementById('scheduleContainer');
+
+        if(mySchedule.length === 0) {
+            container.innerHTML = `<div class="glass-card p-10 rounded-3xl text-center col-span-full"><h3 class="text-xl text-slate-400 font-bold">No classes today! 🎉</h3></div>`;
+        } else {
+            mySchedule.forEach((cls) => {
+                // Check if already marked present today
+                const storageKey = `${currentUser}_${today}_${cls.id}`;
+                const isPresent = localStorage.getItem(storageKey) === 'true';
+
+                const card = document.createElement('div');
+                card.className = `glass-card p-6 rounded-[2rem] border-l-4 ${isPresent ? 'border-l-green-500 opacity-70' : 'border-l-cyan-500'}`;
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <h3 class="text-xl font-black text-white">${cls.name}</h3>
+                            <p class="text-xs text-slate-400 font-bold uppercase mt-1">Duration: ${cls.duration}</p>
+                        </div>
+                        <div class="w-8 h-8 rounded-full ${isPresent ? 'bg-green-500/20 text-green-400' : 'bg-slate-800 text-slate-500'} flex items-center justify-center text-sm">
+                            ${isPresent ? '✓' : '•'}
+                        </div>
+                    </div>
+                    <button id="btn_${cls.id}" onclick="markClassPresent('${cls.id}', '${cls.name}')" 
+                        class="w-full py-4 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${isPresent ? 'bg-green-500/10 text-green-500 border border-green-500/20 cursor-not-allowed' : 'bg-white text-black hover:bg-cyan-400 shadow-lg'}">
+                        ${isPresent ? 'Attendance Marked' : 'Mark Present'}
+                    </button>
+                `;
+                container.appendChild(card);
+            });
         }
-        window.addEventListener("scroll", reveal);
 
-        // Interaction
-        function markAttendance(btn) {
-            btn.innerHTML = "LOCATING...";
-            btn.style.backgroundColor = "#334155";
-            btn.style.color = "white";
+        // 5. Mark Attendance Logic
+        function markClassPresent(classId, className) {
+            const storageKey = `${currentUser}_${today}_${classId}`;
+            
+            // Prevent double clicking
+            if(localStorage.getItem(storageKey) === 'true') return;
+
+            const btn = document.getElementById(`btn_${classId}`);
+            btn.innerHTML = "VERIFYING LOC...";
+            btn.className = "w-full py-4 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-slate-700 text-white cursor-wait";
+
             setTimeout(() => {
-                btn.innerHTML = "SYNC SUCCESSFUL";
-                btn.style.backgroundColor = "#22c55e";
-            }, 2000);
+                localStorage.setItem(storageKey, 'true');
+                
+                // Update total attendance count
+                let totalPresent = parseInt(localStorage.getItem(`${currentUser}_totalPresent`) || '0');
+                localStorage.setItem(`${currentUser}_totalPresent`, totalPresent + 1);
+                
+                // Reload page to update UI
+                window.location.reload();
+            }, 1000);
+        }
+
+        // 6. Update Stats UI
+        let totalPresent = parseInt(localStorage.getItem(`${currentUser}_totalPresent`) || '0');
+        document.getElementById('attendedClasses').innerText = totalPresent;
+        
+        // Assuming 30 classes total for the semester so far for the percentage
+        let assumedTotalClasses = 30; 
+        document.getElementById('totalClasses').innerText = assumedTotalClasses;
+        document.getElementById('attendancePercent').innerText = Math.min(100, Math.round((totalPresent / assumedTotalClasses) * 100)) + '%';
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
         }
     </script>
 </body>
